@@ -19,6 +19,10 @@ public class AzureBlobService
 
     }
 
+    /// <summary>
+    /// Run Query and List Blobs
+    /// </summary>
+    /// <returns></returns>
     public async Task QueryAndListBlobsAsync()
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
@@ -26,13 +30,17 @@ public class AzureBlobService
 
         await foreach (var blobItem in containerClient.GetBlobsAsync())
         {
-            Console.WriteLine($"Blob: {blobItem.Name}");
+            Console.WriteLine($"Found Blob: {blobItem.Name}");
         }
     }
 
+    /// <summary>
+    /// Upload File to Blob Storage
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
     public async Task UploadFileAsync(string filePath)
     {
-        var blobUrsIs = new List<Uri>();
         var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
         // Get a reference to a blob
         BlobClient blobClient = containerClient.GetBlobClient(filePath.Split('/').Last());
@@ -41,5 +49,28 @@ public class AzureBlobService
 
         // Upload data from the local file, overwrite the blob if it already exists
         await blobClient.UploadAsync(filePath, true);
+    }
+
+    // public async Task DownloadFileAsync(string filePath)
+    // {
+    //     var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
+    //     BlobClient blobClient = containerClient.GetBlobClient(filePath.Split('/').Last());
+
+    //     Console.WriteLine("Downloading blob to\n\t{0}\n", filePath);
+
+    //     // Download the blob's contents and save it to a file
+    //     await blobClient.DownloadToAsync(filePath);
+    // }
+
+    public async Task SearchAndDeleteBlobAsync()
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
+        await containerClient.CreateIfNotExistsAsync();
+
+        await foreach (var blobItem in containerClient.GetBlobsAsync())
+        {
+            Console.WriteLine($"Deleting Blob: {blobItem.Name}");
+            await containerClient.DeleteBlobAsync(blobItem.Name);
+        }
     }
 }
