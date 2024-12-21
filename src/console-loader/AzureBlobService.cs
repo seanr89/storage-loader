@@ -1,6 +1,7 @@
 
 using Azure.Storage;
 using Azure.Storage.Blobs;
+using Newtonsoft.Json;
 
 public class AzureBlobService
 {
@@ -46,6 +47,36 @@ public class AzureBlobService
 
         // Upload data from the local file, overwrite the blob if it already exists
         await blobClient.UploadAsync(filePath, true);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fileData"></param>
+    /// <returns></returns>
+    public async Task UploadListToBlobAsync()
+    {
+        List<Trans> fileData = new List<Trans>();
+        fileData.Add(new Trans { Name = "Hello" });
+        fileData.Add(new Trans { Name = "World" });
+        var stringData = JsonConvert.SerializeObject(fileData);
+        var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
+        BlobClient blobClient = containerClient.GetBlobClient("testfile.json");
+
+        _ = await blobClient.UploadAsync(BinaryData.FromString(stringData), overwrite: true);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fileData"></param>
+    /// <returns></returns>
+    public async Task UploadListToBlobAsync(List<string> fileData)
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
+        BlobClient blobClient = containerClient.GetBlobClient("testfile.txt");
+
+        _ = await blobClient.UploadAsync(BinaryData.FromString(fileData.ToString()), overwrite: true);
     }
 
     public async Task DownloadFileAsync(string filePath)
