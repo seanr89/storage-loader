@@ -1,7 +1,4 @@
 
-
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 
@@ -51,16 +48,16 @@ public class AzureBlobService
         await blobClient.UploadAsync(filePath, true);
     }
 
-    // public async Task DownloadFileAsync(string filePath)
-    // {
-    //     var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
-    //     BlobClient blobClient = containerClient.GetBlobClient(filePath.Split('/').Last());
+    public async Task DownloadFileAsync(string filePath)
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient("dailyupdates");
+        BlobClient blobClient = containerClient.GetBlobClient("transactions.csv");
 
-    //     Console.WriteLine("Downloading blob to\n\t{0}\n", filePath);
+        Console.WriteLine("Downloading blob to\n\t{0}\n", filePath);
 
-    //     // Download the blob's contents and save it to a file
-    //     await blobClient.DownloadToAsync(filePath);
-    // }
+        // Download the blob's contents and save it to a file
+        await blobClient.DownloadToAsync(filePath);
+    }
 
     public async Task SearchAndDeleteBlobAsync()
     {

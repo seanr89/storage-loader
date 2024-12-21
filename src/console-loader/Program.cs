@@ -6,10 +6,12 @@ var azureBlobService = new AzureBlobService();
 await azureBlobService.QueryAndListBlobsAsync();
 
 // Simple file write!!
-// await azureBlobService.UploadFileAsync("../files/transactions.csv");
+await azureBlobService.UploadFileAsync("../files/transactions.csv");
+
+await azureBlobService.DownloadFileAsync("../files/transactions-downloaded.csv");
 
 // Now we will search and delete the blobs
-await azureBlobService.SearchAndDeleteBlobAsync();
+//await azureBlobService.SearchAndDeleteBlobAsync();
 
 Console.WriteLine("Press any key to exit");
 Console.ReadKey();
