@@ -11,6 +11,8 @@ public class AzureBlobService
 
     public AzureBlobService(){
 
+        _storageAccount = Environment.GetEnvironmentVariable("STORAGE_ACCOUNT");
+        _storageKey = Environment.GetEnvironmentVariable("STORAGE_KEY");
         var cred = new StorageSharedKeyCredential(_storageAccount, _storageKey);
         var blobUri = new Uri($"https://{_storageAccount}.blob.core.windows.net");
         _blobServiceClient = new BlobServiceClient(blobUri, cred);
@@ -100,5 +102,33 @@ public class AzureBlobService
             Console.WriteLine($"Deleting Blob: {blobItem.Name}");
             await containerClient.DeleteBlobAsync(blobItem.Name);
         }
+    }
+
+    /// <summary>
+    /// Aync process to attempt to remove a single file via the blob client
+    /// uses the updatetype as the container blob name
+    /// </summary>
+    public async Task TryRemoveFile(string prefix, string fileName)
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient(prefix);
+        var blobClient = containerClient.GetBlobClient(fileName);
+        await blobClient.DeleteIfExistsAsync();
+    }
+
+    /// <summary>
+    /// Request the file names for a given update type
+    /// </summary>
+    /// <param name="updateType"></param>
+    /// <returns></returns>
+    public async Task<List<string>> GetFileNamesForUpdateType(string prefix)
+    {
+        List<string> result = [];
+        var containerClient = _blobServiceClient.GetBlobContainerClient(prefix);
+        await foreach (var blobItem in containerClient.GetBlobsAsync())
+        {
+            Console.WriteLine(blobItem.Name);
+            result.Add(blobItem.Name);
+        }
+        return result;
     }
 }
